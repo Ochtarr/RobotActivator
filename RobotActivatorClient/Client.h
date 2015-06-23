@@ -8,6 +8,12 @@
 #ifndef CLIENT_H_
 #define CLIENT_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <poll.h>
+#include <errno.h>
+
 /*
  * ---------------------------------------
  * 		DEFINITION
@@ -38,7 +44,7 @@ struct Robot{
 int main();
 int afficherMenu();
 void lancerAction(int choix, struct Robot r);
-void connexionServeur();
+int connexionServeur(struct Robot r);
 void deconnexionServeur();
 void envoyer_etat(int etat);
 void changerEtat();

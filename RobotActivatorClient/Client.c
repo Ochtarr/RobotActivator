@@ -32,6 +32,7 @@ void lancerAction(int choix, struct Robot r){
 
 	//Connexion au serveur
 	case 1:
+		connexionServeur(r);
 		break;
 	//Deconnexion du serveur
 	case 2:
@@ -75,11 +76,52 @@ void changerEtat(struct Robot r){
 }
 
 
-void connexionServeur(){
-
+int connexionServeur(struct Robot r){
 	/* Données de connexion au serveur */
+	struct sockaddr_in sin;
+	sin.sin_family = AF_INET; /* La famille du protocole */
+	sin.sin_port = htons(2000); /* Le port au format reseau htons = Host To Network Short */
+	sin.sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
 
+	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
+	if(sock != -1){
+		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
+		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
+		{
+			perror("connect");
+			return(errno);
+		}
 
+		//déclaration du message à envoyer
+		char buffer[1024]= "robot connection";
+
+		/* Envoi buffer chez le serveur, write prend en parametre la socket, ce qui doit etre envoye et sa taille ) */
+		if(write(sock, buffer, sizeof(buffer)) == -1)
+		{
+			perror("write message in socket");
+			return errno;
+		}
+
+	}
+	else{
+		return(errno);
+	}
+	close(sock);
+}
+
+/*
+	Cree une socket
+	parametre le domaine, le type et le protocole
+	retourne un type errno
+*/
+int creationSocket(int domaine, int type, int protocol){
+	int sock = socket(domaine, type, protocol);
+	if(sock == -1)
+	{
+		perror("socket");
+		return errno;
+	}
+	return sock;
 }
 
 void deconnexionServeur(){
