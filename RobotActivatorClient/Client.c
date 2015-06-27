@@ -17,12 +17,13 @@ int main(){
 	//Lancement du robot : choix de l'action
 	puts("Lancement du Robot ...\n\n");
 	int choix = -1;
+	bool state = false;
 
 	do{
 		choix = afficherMenu();
-		lancerAction(choix, r);
+		state = lancerAction(choix, r);
 	}
-	while(choix<1 || choix>4);
+	while((choix<1 || choix>4) && state==false);
 
 	return 0;
 }
@@ -38,7 +39,7 @@ bool lancerAction(int choix, struct Robot r){
 		break;
 	//Deconnexion du serveur
 	case 2:
-		state = econnexionServeur(r);
+		state = deconnexionServeur(r);
 		break;
 	//Changer l'état du robot
 	case 3:
@@ -146,6 +147,14 @@ int deconnexionServeur(struct Robot r){
 	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
 	int executionSock = 0;
 	if(sock != -1){
+
+		struct sockaddr_in sin;
+		sin.sin_family = AF_INET; /* La famille du protocole */
+		sin.sin_port = htons(2000); /* Le port au format reseau htons = Host To Network Short */
+		struct in_addr sin_addr;
+		sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
+		sin.sin_addr = sin_addr;
+
 		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
 		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
 		{
@@ -178,6 +187,14 @@ int envoyer_etat(struct Robot r){
 	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
 	int executionSock = 0;
 	if(sock != -1){
+
+		struct sockaddr_in sin;
+		sin.sin_family = AF_INET; /* La famille du protocole */
+		sin.sin_port = htons(2000); /* Le port au format reseau htons = Host To Network Short */
+		struct in_addr sin_addr;
+		sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
+		sin.sin_addr = sin_addr;
+
 		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
 		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
 		{

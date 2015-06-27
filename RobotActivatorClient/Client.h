@@ -35,15 +35,6 @@ struct Robot{
 	int identification ;
 };
 
-
-
-/*
-	int sin_family = AF_INET;
-	int sin_port = htons(2000);
-	int sin_addr = inet_addr("127.0.0.1");
-*/
-
-
 /*
  * ---------------------------------------
  * 		PROTOTYPES DES ACTIONS
@@ -52,10 +43,10 @@ struct Robot{
 
 int main();
 int afficherMenu();
-void lancerAction(int choix, struct Robot r);
+bool lancerAction(int choix, struct Robot r);
 int connexionServeur(struct Robot r);
 int deconnexionServeur(struct Robot r);
-int envoyer_etat(int etat, struct Robot r);
+int envoyer_etat(struct Robot r);
 void changerEtat();
 
 
