@@ -27,15 +27,18 @@ int main(){
 	return 0;
 }
 
-void lancerAction(int choix, struct Robot r){
+bool lancerAction(int choix, struct Robot r){
+	bool state = false;
+
 	switch (choix){
 
 	//Connexion au serveur
 	case 1:
-		connexionServeur(r);
+		state = connexionServeur(r);
 		break;
 	//Deconnexion du serveur
 	case 2:
+		state = econnexionServeur(r);
 		break;
 	//Changer l'état du robot
 	case 3:
@@ -43,8 +46,14 @@ void lancerAction(int choix, struct Robot r){
 		break;
 	//Envoyer le changement d'état
 	case 4:
+		state = envoyer_etat(r);
 		break;
+	default:
+		puts("Erreur dans le choix de l'action");
+		state = false;
 	}
+
+	return state;
 }
 
 int afficherMenu(){
@@ -78,13 +87,18 @@ void changerEtat(struct Robot r){
 
 int connexionServeur(struct Robot r){
 	/* Données de connexion au serveur */
-	struct sockaddr_in sin;
-	sin.sin_family = AF_INET; /* La famille du protocole */
-	sin.sin_port = htons(2000); /* Le port au format reseau htons = Host To Network Short */
-	sin.sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
 
 	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
+	int executionSock = 0;
 	if(sock != -1){
+
+		struct sockaddr_in sin;
+		sin.sin_family = AF_INET; /* La famille du protocole */
+		sin.sin_port = htons(2000); /* Le port au format reseau htons = Host To Network Short */
+		struct in_addr sin_addr;
+		sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
+		sin.sin_addr = sin_addr;
+
 		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
 		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
 		{
@@ -95,18 +109,20 @@ int connexionServeur(struct Robot r){
 		//déclaration du message à envoyer
 		char buffer[1024]= "robot connection";
 
+		executionSock = write(sock, buffer, sizeof(buffer));
+
 		/* Envoi buffer chez le serveur, write prend en parametre la socket, ce qui doit etre envoye et sa taille ) */
-		if(write(sock, buffer, sizeof(buffer)) == -1)
+		if( executionSock == -1)
 		{
 			perror("write message in socket");
 			return errno;
 		}
-
 	}
 	else{
 		return(errno);
 	}
 	close(sock);
+	return executionSock;
 }
 
 /*
@@ -124,10 +140,66 @@ int creationSocket(int domaine, int type, int protocol){
 	return sock;
 }
 
-void deconnexionServeur(){
+int deconnexionServeur(struct Robot r){
+	/* Données de connexion au serveur */
 
+	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
+	int executionSock = 0;
+	if(sock != -1){
+		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
+		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
+		{
+			perror("connect");
+			return(errno);
+		}
+
+		//déclaration du message à envoyer
+		char buffer[1024]= "robot deconnection";
+
+		executionSock = write(sock, buffer, sizeof(buffer));
+
+		/* Envoi buffer chez le serveur, write prend en parametre la socket, ce qui doit etre envoye et sa taille ) */
+		if( executionSock == -1)
+		{
+			perror("write message in socket");
+			return errno;
+		}
+	}
+	else{
+		return(errno);
+	}
+	close(sock);
+	return executionSock;
 }
 
-void envoyer_etat(int etat){
+int envoyer_etat(struct Robot r){
+	/* Données de connexion au serveur */
 
+	int sock = creationSocket(AF_INET, SOCK_STREAM, 0);
+	int executionSock = 0;
+	if(sock != -1){
+		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
+		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
+		{
+			perror("connect");
+			return(errno);
+		}
+
+		//déclaration du message à envoyer
+		char buffer[1024]= "send state";
+
+		executionSock = write(sock, buffer, sizeof(buffer));
+
+		/* Envoi buffer chez le serveur, write prend en parametre la socket, ce qui doit etre envoye et sa taille ) */
+		if( executionSock == -1)
+		{
+			perror("write message in socket");
+			return errno;
+		}
+	}
+	else{
+		return(errno);
+	}
+	close(sock);
+	return executionSock;
 }
