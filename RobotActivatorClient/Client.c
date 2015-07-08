@@ -13,6 +13,7 @@ int main(){
 	struct Robot r;
 	r.etat=false;
 	r.identification=-1;
+	r.estConnecte = false;
 
 	//Lancement du robot : choix de l'action
 	puts("Lancement du Robot ...\n\n");
@@ -23,7 +24,7 @@ int main(){
 		choix = afficherMenu();
 		state = lancerAction(choix, r);
 	}
-	while((choix<1 || choix>4) && state==false);
+	while((choix<1 && choix>4) || continuer==true);
 
 	return 0;
 }
@@ -37,17 +38,26 @@ bool lancerAction(int choix, struct Robot r){
 	case 1:
 		state = connexionServeur(r);
 		break;
+
 	//Deconnexion du serveur
 	case 2:
 		state = deconnexionServeur(r);
 		break;
+
 	//Changer l'état du robot
 	case 3:
 		changerEtat(r);
+		state = true;
 		break;
+
 	//Envoyer le changement d'état
 	case 4:
 		state = envoyer_etat(r);
+		break;
+
+	//Quitter
+	case 5:
+		continuer = false;
 		break;
 	default:
 		puts("Erreur dans le choix de l'action");
@@ -66,17 +76,22 @@ int afficherMenu(){
 	puts("\t 2- Deconnexion du serveur");
 	puts("\t 3- Changer l'état du robot");
 	puts("\t 4- Envoyer l'état du robot au serveur");
+	puts("\t 5- Quitter");
 	puts("\n\n");
 
 	do{
-		puts("Votre choix (1-4) :\t");
+		puts("Votre choix (1-5) :\t");
 		scanf("%d", &choix);
 	}
-	while(choix < 1 || choix > 4);
+	while(choix < 1 || choix > 5);
 
 	return choix;
 }
 
+/**
+ * Cette fonction permet de changer l'état d'un robot passé en paramètre
+ * Un message est affiché à l'utilisateur
+ */
 void changerEtat(struct Robot r){
 	if(r.etat==false)
 		r.etat=true;
@@ -86,6 +101,10 @@ void changerEtat(struct Robot r){
 }
 
 
+/*
+ * Cette fonction permet au robot de se connecter sur le serveur
+ *
+ */
 int connexionServeur(struct Robot r){
 	/* Données de connexion au serveur */
 
@@ -100,7 +119,7 @@ int connexionServeur(struct Robot r){
 		sin_addr.s_addr = inet_addr("127.0.0.1"); /* Peut etre n'importe qu'elle adresse IP, 127.0.0.1 = localhost = Pc utilise */
 		sin.sin_addr = sin_addr;
 
-		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertis en sockaddr et la taille de sockaddr*/
+		/* Connect, connect prend en parametre la socket, la structure sockaddr_in qui doit etre convertie en sockaddr et la taille de sockaddr*/
 		if(connect(sock, (struct sockaddr *)&sin, sizeof(struct sockaddr)) == -1)
 		{
 			perror("connect");

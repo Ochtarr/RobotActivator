@@ -2,7 +2,13 @@
  * Client.h
  *
  *  Created on: 16 juin 2015
- *      Author: florian
+ *
+ *  Author: florian
+ *
+ *  Summary : Client Robot
+ *  - peut se connecter et se déconnecter à un serveur sur la meme machine
+ *  - peut modifier son etat
+ *  - peut envoyer son etat au serveur
  */
 
 #ifndef CLIENT_H_
@@ -32,8 +38,11 @@
 
 struct Robot{
 	bool etat ;
+	bool estConnecte;
 	int identification ;
 };
+
+bool continuer = true;
 
 /*
  * ---------------------------------------
@@ -44,10 +53,12 @@ struct Robot{
 int main();
 int afficherMenu();
 bool lancerAction(int choix, struct Robot r);
+
 int connexionServeur(struct Robot r);
 int deconnexionServeur(struct Robot r);
 int envoyer_etat(struct Robot r);
 void changerEtat();
 
+int creationSocket(int domaine, int type, int protocol);
 
 #endif /* CLIENT_H_ */

@@ -41,6 +41,7 @@ int main();
 void ecouterPort(int port);
 
 int creationSocket(int domaine, int type, int protocol);
-
+void viderBuffer();
+int readStr(char *str, int len);
 
 #endif /* SERVER_H_ */
